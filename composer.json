@@ -5,7 +5,7 @@
     "license": "GPLv2",
     "autoload": {
         "psr-4": {
-            "Drewapicture\\SharperClaws\\": "src/"
+            "SharperClaws\\": "src/"
         }
     },
     "authors": [
