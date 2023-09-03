@@ -1,0 +1,19 @@
+{
+    "name": "drewapicture/sharper-claws",
+    "description": "A sharper claws package",
+    "type": "library",
+    "license": "GPLv2",
+    "autoload": {
+        "psr-4": {
+            "Drewapicture\\SharperClaws\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Drew Jaynes",
+            "email": "drew@drewapicture.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
