@@ -27,7 +27,6 @@ use SharperClaws\Enums\SqlType;
  */
 class Claws
 {
-
     /**
      * Represents the current clause being worked with.
      *
@@ -110,7 +109,7 @@ class Claws
          */
         switch ($name) {
             case 'or':
-                $clause = isset($args[0]) ? $args[0] : null;
+                $clause = $args[0] ?: null;
 
                 // Shared logic.
                 $this->__setCurrentOperator(Operator::OR, $clause);
@@ -118,7 +117,7 @@ class Claws
                 return $this;
 
             case 'and':
-                $clause = isset($args[0]) ? $args[0] : null;
+                $clause = $args[0] ?: null;
 
                 // Shared logic.
                 $this->__setCurrentOperator(Operator::AND, $clause);
@@ -621,7 +620,7 @@ class Claws
         }
 
         $callback = $this->getCallback($callback_or_type);
-        $values = $this->prepareValues($values);
+        $values   = $this->prepareValues($values);
 
         // Sanitize the values and built the SQL.
         $values = array_map($callback, $values);
@@ -648,9 +647,9 @@ class Claws
     ) : string {
         $sql = '';
 
-        $count = count($values);
+        $count   = count($values);
         $current = 0;
-        $field = $this->getCurrentField();
+        $field   = $this->getCurrentField();
 
         // Loop through the values and bring in $operator if needed.
         foreach ($values as $value) {
@@ -694,8 +693,8 @@ class Claws
         string|callable $callback_or_type,
         string $compare_type
     ) : string {
-        $field = $this->getCurrentField();
-        $callback = $this->getCallback($callback_or_type);
+        $field        = $this->getCurrentField();
+        $callback     = $this->getCallback($callback_or_type);
         $compare_type = strtoupper($compare_type);
 
         if (!in_array($compare_type, ['IN', 'NOT IN'])) {
@@ -741,16 +740,16 @@ class Claws
     ) : string {
         $sql = '';
 
-        $callback = $this->getCallback($callback_or_type);
-        $field = $this->getCurrentField();
-        $values = $this->prepareValues($values);
+        $callback     = $this->getCallback($callback_or_type);
+        $field        = $this->getCurrentField();
+        $values       = $this->prepareValues($values);
         $compare_type = strtoupper($compare_type);
 
         if (!in_array($compare_type, ['LIKE', 'NOT LIKE'])) {
             $compare_type = 'LIKE';
         }
 
-        $values = array_map($callback, $values);
+        $values      = array_map($callback, $values);
         $value_count = count($values);
 
         $current = 0;
@@ -799,7 +798,7 @@ class Claws
             $compare_type = 'BETWEEN';
         }
 
-        $field = $this->getCurrentField();
+        $field    = $this->getCurrentField();
         $callback = $this->getCallback($callback_or_type);
 
         // Grab the first two values in the array.
@@ -972,7 +971,7 @@ class Claws
 
             $this->previousPhrase = $sql;
         } else {
-            $this->previousPhrase = $sql;
+            $this->previousPhrase               = $sql;
             $this->clausesInProgress[$clause][] = $this->previousPhrase;
         }
     }
@@ -982,15 +981,15 @@ class Claws
      *
      * @since 1.0.0
      *
-     * @param null|string $clause     Optional. Clause to build SQL for. Default is the current clause.
-     * @param null|bool   $reset_vars Optional. Whether to reset the clause, field, and operator vars
-     *                                after retrieving the clause's SQL. Default true.
+     * @param null|string $clause    Optional. Clause to build SQL for. Default is the current clause.
+     * @param null|bool   $resetVars Optional. Whether to reset the clause, field, and operator vars
+     *                               after retrieving the clause's SQL. Default true.
      *
      * @return string Raw, sanitized SQL.
      */
     public function getSql(
         ?string $clause = null,
-        ?bool $reset_vars = true
+        ?bool $resetVars = true
     ) : string {
         $sql = '';
 
@@ -1009,7 +1008,7 @@ class Claws
                 }
             }
 
-            if (true === $reset_vars) {
+            if (true === $resetVars) {
                 $this->resetVars();
             }
         }
@@ -1172,8 +1171,8 @@ class Claws
      */
     public function resetVars() : void
     {
-        $this->currentClause = '';
-        $this->currentField = '';
+        $this->currentClause   = '';
+        $this->currentField    = '';
         $this->currentOperator = Operator::OR;
     }
 
@@ -1252,18 +1251,19 @@ class Claws
             $values = $values[0];
         }
 
-        $new_query = '';
+        $new_query       = '';
         $key
-            = 2; // Keys 0 and 1 in $split_query contain values before the first placeholder.
-        $arg_id = 0;
+                         =
+            2; // Keys 0 and 1 in $split_query contain values before the first placeholder.
+        $arg_id          = 0;
         $arg_identifiers = [];
-        $arg_strings = [];
+        $arg_strings     = [];
 
         while ($key < $split_query_count) {
             $placeholder = $split_query[$key];
 
             $format = substr($placeholder, 1, -1);
-            $type = substr($placeholder, -1);
+            $type   = substr($placeholder, -1);
 
             if ('f' === $type
                 && '%' === substr(
@@ -1285,7 +1285,7 @@ class Claws
             } else {
                 // Force floats to be locale-unaware.
                 if ('f' === $type) {
-                    $type = 'F';
+                    $type        = 'F';
                     $placeholder = '%'.$format.$type;
                 }
 
