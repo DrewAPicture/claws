@@ -13,6 +13,8 @@
 
 namespace SharperClaws;
 
+use SharperClaws\Enums\SqlType;
+
 /**
  * Implements a library to provide a variety of database sanitization helpers when
  * interacting with WordPress' wp-db class for custom queries.
@@ -565,18 +567,18 @@ class Claws {
 
 		// Loop through the values and bring in $operator if needed.
 		foreach ( $values as $value ) {
-			$type = $this->getCastForType( gettype( $value ) );
+			$type = $this->getCastForType(gettype($value));
 
 			$value = $wpdb->prepare( '%s', $value );
 
-			if ( 'CHAR' !== $type ) {
+			if ( SqlType::CHAR->value !== $type ) {
 				$value = "CAST( {$value} AS {$type} )";
 			}
 
 			$sql .= "`{$field}` {$compare_type} {$value}";
 
 			if ( ++$current !== $count ) {
-				$sql .= " {$operator} ";
+				$sql .= " {$operator->value} ";
 			}
 		}
 
@@ -802,28 +804,12 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @see WP_Meta_Query::get_cast_for_type()
-	 *
 	 * @param string $type Value type (as derived from gettype()).
 	 * @return string MySQL-ready CAST type.
 	 */
-	public function getCastForType( string $type ) : string
+	public function getCastForType(string $type) : string
 	{
-		$type = strtoupper( $type );
-
-		if ( ! preg_match( '/^(?:BINARY|CHAR|DATE|DATETIME|SIGNED|UNSIGNED|TIME|DOUBLE|INTEGER|NUMERIC(?:\(\d+(?:,\s?\d+)?\))?|DECIMAL(?:\(\d+(?:,\s?\d+)?\))?)$/', $type ) ) {
-			return 'CHAR';
-		}
-
-		if ( 'INTEGER' === $type || 'NUMERIC' === $type ) {
-			$type = 'SIGNED';
-		}
-
-		if ( 'DOUBLE' === $type ) {
-			$type = 'DECIMAL';
-		}
-
-		return $type;
+		return SqlType::CHAR->resolve($type);
 	}
 
 	/**
