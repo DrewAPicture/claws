@@ -141,7 +141,7 @@ class Claws {
 	 */
 	public function where( $field, $compare_type = null, $values = null, $callback_or_type = 'esc_sql' ) {
 		$this->setCurrentClause( 'where' );
-		$this->set_current_field( $field );
+		$this->setCurrentField( $field );
 
 		// Handle shorthand comparison phrases.
 		if ( isset( $compare_type ) && isset( $values ) ) {
@@ -968,7 +968,7 @@ class Claws {
 	 * @param string $field Field to set as current.
 	 * @return Claws Current claws instance.
 	 */
-	public function set_current_field( $field ) {
+	public function setCurrentField( $field ) {
 		if ( $field !== $this->getCurrentField() ) {
 			$this->currentField = sanitize_key( $field );
 		}
