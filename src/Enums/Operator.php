@@ -4,6 +4,6 @@ namespace SharperClaws\Enums;
 
 enum Operator : string
 {
-	case OR = 'OR';
-	case AND = 'AND';
+    case OR = 'OR';
+    case AND = 'AND';
 }
