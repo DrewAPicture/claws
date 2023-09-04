@@ -110,7 +110,7 @@ class Claws
          */
         switch ($name) {
             case 'or':
-                $clause = isset($args[0]) ? $args[0] : null;
+                $clause = $args[0] ?: null;
 
                 // Shared logic.
                 $this->__setCurrentOperator(Operator::OR, $clause);
@@ -118,7 +118,7 @@ class Claws
                 return $this;
 
             case 'and':
-                $clause = isset($args[0]) ? $args[0] : null;
+                $clause = $args[0] ?: null;
 
                 // Shared logic.
                 $this->__setCurrentOperator(Operator::AND, $clause);
