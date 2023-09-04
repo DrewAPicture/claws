@@ -94,9 +94,10 @@ class Claws {
 	 *
 	 * @param string $name Method name.
 	 * @param array  $args Method arguments.
+	 * @return static Claws instance.
 	 */
-	public function __call( $name, $args ) {
-
+	public function __call( $name, $args ) : static
+	{
 		/*
 		 * Prior to PHP 7, reserved keywords could not be used in method names,
 		 * so having or()/and() methods wouldn't be allowed. Using __call() allows
@@ -123,6 +124,7 @@ class Claws {
 				break;
 		}
 
+		return $this;
 	}
 
 	/**
@@ -137,9 +139,10 @@ class Claws {
 	 *                                          '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN',
 	 *                                          'NOT BETWEEN', 'EXISTS' or 'NOT EXISTS'.
 	 *                                          Default is 'IN' when `$value` is an array, '=' otherwise.
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function where( $field, $compare_type = null, $values = null, $callback_or_type = 'esc_sql' ) {
+	public function where( $field, $compare_type = null, $values = null, $callback_or_type = 'esc_sql' ) : static
+	{
 		$this->setCurrentClause( 'where' );
 		$this->setCurrentField( $field );
 
@@ -162,9 +165,10 @@ class Claws {
 	 * @param string           $type     Type of comparison. Accepts '=', '!=', '<', '>', '>=', or '<='.
 	 * @param string|int|array $values   Single value(s) of varying type, or an array of values.
 	 * @param callable         $callback Callback to pass to the comparison method.
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function compare( $type, $values, $callback ) {
+	public function compare( $type, $values, $callback ) : static
+	{
 		switch( $type ) {
 			case '!=':
 				$this->doesntEqual( $values, $callback );
@@ -205,10 +209,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function equals( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function equals( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->getComparisonSql( $values, $callback_or_type, '=', $operator );
 
 		$this->addClauseSql( $sql );
@@ -226,10 +230,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function doesntEqual( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function doesntEqual( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->getComparisonSql( $values, $callback_or_type, '!=', $operator );
 
 		$this->addClauseSql( $sql );
@@ -247,10 +251,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function gt( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function gt( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->getComparisonSql( $values, $callback_or_type, '>', $operator );
 
 		$this->addClauseSql( $sql );
@@ -268,10 +272,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function lt( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function lt( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->getComparisonSql( $values, $callback_or_type, '<', $operator );
 
 		$this->addClauseSql( $sql );
@@ -289,10 +293,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function gte( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function gte( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->getComparisonSql( $values, $callback_or_type, '>=', $operator );
 
 		$this->addClauseSql( $sql );
@@ -310,10 +314,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function lte( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function lte( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->getComparisonSql( $values, $callback_or_type, '<=', $operator );
 
 		$this->addClauseSql( $sql );
@@ -331,10 +335,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default `Claws->esc_like()`.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function like( $values, $callback_or_type = 'esc_like', $operator = 'OR' ) {
+	public function like( $values, $callback_or_type = 'esc_like', $operator = 'OR' ) : static
+	{
 		$sql = $this->getLikeSql( $values, $callback_or_type, 'LIKE', $operator );
 
 		$this->addClauseSql( $sql );
@@ -352,10 +356,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default is `Claws->esc_like()`.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function notLike( $values, $callback_or_type = 'esc_like', $operator = 'OR' ) {
+	public function notLike( $values, $callback_or_type = 'esc_like', $operator = 'OR' ) : static
+	{
 		$sql = $this->getLikeSql( $values, $callback_or_type, 'NOT LIKE', $operator );
 
 		$this->addClauseSql( $sql );
@@ -373,10 +377,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function in( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function in( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		if ( ! is_array( $values ) ) {
 
 			$this->equals( $values, $callback_or_type, $operator );
@@ -401,10 +405,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function notIn( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function notIn( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		if ( ! is_array( $values ) ) {
 
 			$this->doesntEqual( $values, $callback_or_type, $operator );
@@ -431,10 +435,10 @@ class Claws {
 	 * @param array           $values           Array of values.
 	 * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function between( $values, $callback_or_type = 'esc_sql' ) {
+	public function between( $values, $callback_or_type = 'esc_sql' ) : static
+	{
 		$sql = $this->getBetweenSql( $values, $callback_or_type, 'BETWEEN' );
 
 		$this->addClauseSql( $sql );
@@ -450,10 +454,10 @@ class Claws {
 	 * @param mixed           $values           Value of varying types, or array of values.
 	 * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function notBetween( $values, $callback_or_type = 'esc_sql' ) {
+	public function notBetween( $values, $callback_or_type = 'esc_sql' ) : static
+	{
 		$sql = $this->getBetweenSql( $values, $callback_or_type, 'NOT BETWEEN' );
 
 		$this->addClauseSql( $sql );
@@ -471,10 +475,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function exists( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function exists( $values, $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		return $this->equals( $values, $callback_or_type, $operator );
 	}
 
@@ -487,10 +491,10 @@ class Claws {
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @param string          $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
 	 *                                          building the expression. Default 'OR'.
-	 *
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	public function notExists( $callback_or_type = 'esc_sql', $operator = 'OR' ) {
+	public function notExists( $callback_or_type = 'esc_sql', $operator = 'OR' ) : static
+	{
 		$sql = $this->buildComparisonSql( array( '' ), 'IS NULL', $operator );
 
 		$this->addClauseSql( $sql );
@@ -512,7 +516,8 @@ class Claws {
 	 *                                           Accepts 'OR' or 'AND'. Default 'OR'.
 	 * @return string Raw, sanitized SQL.
 	 */
-	protected function getComparisonSql( $values, $callback_or_type, $compare_type, $operator = 'OR' ) {
+	protected function getComparisonSql( $values, $callback_or_type, $compare_type, $operator = 'OR' ) : string
+	{
 		if ( ! in_array( $compare_type, array( '=', '!=', '<', '>', '<=', '>=' ) ) ) {
 			$compare_type = '=';
 		}
@@ -538,7 +543,8 @@ class Claws {
 	 * @param string $operator     Operator to use between value comparisons.
 	 * @return string Comparison SQL.
 	 */
-	protected function buildComparisonSql( $values, $compare_type, $operator ) {
+	protected function buildComparisonSql( $values, $compare_type, $operator ) : string
+	{
 		global $wpdb;
 
 		$sql = '';
@@ -583,7 +589,8 @@ class Claws {
 	 * @param string          $compare_type     Comparison to make. Accepts 'IN' or 'NOT IN'.
 	 * @return string Raw, sanitized SQL.
 	 */
-	protected function getInSql( $values, $callback_or_type, $compare_type ) {
+	protected function getInSql( $values, $callback_or_type, $compare_type ) : string
+	{
 		$field    = $this->getCurrentField();
 		$callback = $this->getCallback( $callback_or_type );
 		$compare_type  = strtoupper( $compare_type );
@@ -621,7 +628,8 @@ class Claws {
 	 * @param string          $compare_type     Comparison to make. Accepts 'LIKE' or 'NOT LIKE'.
 	 * @return string Raw, sanitized SQL.
 	 */
-	protected function getLikeSql( $values, $callback_or_type, $compare_type, $operator ) {
+	protected function getLikeSql( $values, $callback_or_type, $compare_type, $operator ) : string
+	{
 		$sql = '';
 
 		$callback     = $this->getCallback( $callback_or_type );
@@ -663,7 +671,8 @@ class Claws {
 	 * @param string          $compare_type     Comparison to make. Accepts 'BETWEEN' or 'NOT BETWEEN'.
 	 * @return string Raw, sanitized SQL.
 	 */
-	protected function getBetweenSql( $values, $callback_or_type, $compare_type ) {
+	protected function getBetweenSql( $values, $callback_or_type, $compare_type ) : string
+	{
 		global $wpdb;
 
 		$sql = '';
@@ -710,7 +719,8 @@ class Claws {
 	 * @param string|callable $callback_or_type Standard type to retrieve a callback for, or an callback.
 	 * @return callable Callback.
 	 */
-	public function getCallback( $callback_or_type ) {
+	public function getCallback( $callback_or_type ) : callable
+	{
 
 		$callback = is_callable( $callback_or_type ) ? $callback_or_type : $this->getCallbackForType( $callback_or_type );
 
@@ -736,9 +746,10 @@ class Claws {
 	 * @since 1.0.0
 	 *
 	 * @param string $type Type of value to retrieve a callback for.
-	 * @return string|callable Callback string.
+	 * @return callable Callback string.
 	 */
-	public function getCallbackForType( $type ) {
+	public function getCallbackForType( $type ) : callable
+	{
 		switch( $type ) {
 
 			case 'int':
@@ -781,7 +792,8 @@ class Claws {
 	 * @param string $type Value type (as derived from gettype()).
 	 * @return string MySQL-ready CAST type.
 	 */
-	public function getCastForType( $type ) {
+	public function getCastForType( $type ) : string
+	{
 		$type = strtoupper( $type );
 
 		if ( ! preg_match( '/^(?:BINARY|CHAR|DATE|DATETIME|SIGNED|UNSIGNED|TIME|DOUBLE|INTEGER|NUMERIC(?:\(\d+(?:,\s?\d+)?\))?|DECIMAL(?:\(\d+(?:,\s?\d+)?\))?)$/', $type ) ) {
@@ -807,7 +819,8 @@ class Claws {
 	 * @param string $operator Operator. Accepts 'OR' or 'AND'.
 	 * @return string Operator. 'OR' if an invalid operator is passed to `$operator`.
 	 */
-	public function getOperator( $operator ) {
+	public function getOperator( $operator ) : string
+	{
 		$operator = strtoupper( $operator );
 
 		if ( ! in_array( $operator, array( 'OR', 'AND' ) ) ) {
@@ -825,7 +838,8 @@ class Claws {
 	 * @param mixed $like LIKE comparison value.
 	 * @return string Escaped value.
 	 */
-	protected function escLike( $like ) {
+	protected function escLike( $like ) : string
+	{
 		return addcslashes( $like, '_%\\' );
 	}
 
@@ -839,7 +853,8 @@ class Claws {
 	 * @param mixed|array $values Single values of varying type or an array of values.
 	 * @return array Array of values.
 	 */
-	protected function prepareValues( $values ) {
+	protected function prepareValues( $values ) : array
+	{
 		return is_array( $values ) ? $values : (array) $values;
 	}
 
@@ -850,8 +865,10 @@ class Claws {
 	 *
 	 * @param string      $sql    Prepared SQL to replace the phrase with.
 	 * @param null|string $clause Optional. Clause to replace the last phrase for. Default is the current clause.
+	 * @return void
 	 */
-	protected function replacePreviousPhrase( $sql, $clause = null ) {
+	protected function replacePreviousPhrase( $sql, $clause = null ) : void
+	{
 		$clause = $this->getClause( $clause );
 
 		// Pop off the last phrase.
@@ -868,8 +885,10 @@ class Claws {
 	 *
 	 * @param string      $sql    Prepared SQL to add to the clause.
 	 * @param null|string $clause Optional. Clause to add the SQL to. Default is the current clause.
+	 * @return void
 	 */
-	public function addClauseSql( $sql, $clause = null ) {
+	public function addClauseSql( $sql, $clause = null ) : void
+	{
 		$clause = $this->getClause( $clause );
 
 		if ( true === $this->amendingPrevious ) {
@@ -900,7 +919,8 @@ class Claws {
 	 *                                after retrieving the clause's SQL. Default true.
 	 * @return string Raw, sanitized SQL.
 	 */
-	public function getSql( $clause = null, $reset_vars = true ) {
+	public function getSql( $clause = null, $reset_vars = true ) : string
+	{
 		$sql = '';
 
 		$clause = $this->getClause( $clause );
@@ -932,9 +952,10 @@ class Claws {
 	 * @since 1.0.0
 	 *
 	 * @param string $clause Clause to set as current.
-	 * @return Claws Current claws instance.
+	 * @return static Current claws instance.
 	 */
-	public function setCurrentClause( $clause ) {
+	public function setCurrentClause( $clause ) : static
+	{
 		$clause = strtolower( $clause );
 
 		if ( in_array( $clause, $this->allowedClauses, true ) ) {
@@ -952,7 +973,8 @@ class Claws {
 	 * @param null|string $clause Optional. Clause to retrieve. Default is the current clause.
 	 * @return string Current clause name.
 	 */
-	public function getClause( $clause = null ) {
+	public function getClause( $clause = null ) : string
+	{
 		if ( ! isset( $clause ) || ! in_array( $clause, $this->allowedClauses, true ) ) {
 			$clause = $this->currentClause;
 		}
@@ -966,9 +988,10 @@ class Claws {
 	 * @since 1.0.0
 	 *
 	 * @param string $field Field to set as current.
-	 * @return Claws Current claws instance.
+	 * @return static Current claws instance.
 	 */
-	public function setCurrentField( $field ) {
+	public function setCurrentField( $field ) : static
+	{
 		if ( $field !== $this->getCurrentField() ) {
 			$this->currentField = sanitize_key( $field );
 		}
@@ -983,7 +1006,8 @@ class Claws {
 	 *
 	 * @return string Current field name.
 	 */
-	public function getCurrentField() {
+	public function getCurrentField() : string
+	{
 		return $this->currentField;
 	}
 
@@ -993,9 +1017,10 @@ class Claws {
 	 * @since 1.0.0
 	 *
 	 * @param string $operator Operator to persist between method calls. Accepts 'OR' or 'AND'.
-	 * @return Claws Current claws instance.
+	 * @return static Current claws instance.
 	 */
-	public function setCurrentOperator( $operator ) {
+	public function setCurrentOperator( $operator ) : static
+	{
 		$operator = $this->getOperator( $operator );
 
 		$this->currentOperator = $operator;
@@ -1010,9 +1035,10 @@ class Claws {
 	 *
 	 * @param null|string $clause Optional. Clause to amend the previous chunk for.
 	 *                            Default is the current clause.
-	 * @return Claws Current Claws instance.
+	 * @return static Current Claws instance.
 	 */
-	private function __setCurrentOperator( $operator, $clause ) {
+	private function __setCurrentOperator( $operator, $clause ) : static
+	{
 		$operator = strtoupper( $operator );
 
 		if ( ! in_array( $operator, array( 'OR', 'AND' ) ) ) {
@@ -1039,7 +1065,8 @@ class Claws {
 	 *
 	 * @return string Current operator.
 	 */
-	public function getCurrentOperator() {
+	public function getCurrentOperator() : string
+	{
 		return $this->currentOperator;
 	}
 
@@ -1050,7 +1077,8 @@ class Claws {
 	 *
 	 * @return string Previous phrase SQL.
 	 */
-	public function getPreviousPhrase() {
+	public function getPreviousPhrase() : string
+	{
 		return $this->previousPhrase;
 	}
 
@@ -1058,8 +1086,11 @@ class Claws {
 	 * Resets the current clause, field, and operator.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return void
 	 */
-	public function resetVars() {
+	public function resetVars() : void
+	{
 		$this->currentClause    = null;
 		$this->currentField     = null;
 		$this->currentOperator = null;
