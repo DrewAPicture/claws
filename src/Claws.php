@@ -57,7 +57,7 @@ class Claws {
 	 * Stores clauses in progress for retrieval.
 	 *
 	 * @since 1.0.0
-	 * @var   array<string, string>
+	 * @var   array<string, array<string>>
 	 */
 	private $clausesInProgress = array();
 
@@ -99,7 +99,7 @@ class Claws {
 	 * @param array<mixed> $args Method arguments.
 	 * @return static Claws instance.
 	 */
-	public function __call(string $name, array $args ) : static
+	public function __call(string $name, array $args) : static
 	{
 		/*
 		 * Prior to PHP 7, reserved keywords could not be used in method names,
@@ -784,23 +784,7 @@ class Claws {
 	 */
 	public function getCallback( string|callable $callback_or_type ) : callable
 	{
-
-		$callback = is_callable( $callback_or_type ) ? $callback_or_type : $this->getCallbackForType( $callback_or_type );
-
-		if (function_exists('apply_filters')) {
-			/**
-			 * Filters the callback to use for a given type.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param callable         $callback Callback.
-			 * @param string           $type     Type to retrieve a callback for.
-			 * @param Claws $this     Current Sidebar instance.
-			 */
-			$callback = \apply_filters( 'claws_callback_for_type', $callback, $callback_or_type, $this );
-		}
-
-		return $callback;
+		return is_callable($callback_or_type) ? $callback_or_type : $this->getCallbackForType($callback_or_type);
 	}
 
 	/**
@@ -879,11 +863,11 @@ class Claws {
 	 * @since 1.0.0
 	 *
 	 * @param mixed|array $values Single values of varying type or an array of values.
-	 * @return array Array of values.
+	 * @return array<mixed> Array of values.
 	 */
-	protected function prepareValues( $values ) : array
+	protected function prepareValues($values) : array
 	{
-		return is_array( $values ) ? $values : (array) $values;
+		return (array) $values;
 	}
 
 	/**
@@ -897,13 +881,13 @@ class Claws {
 	 */
 	protected function replacePreviousPhrase( string $sql, ?string $clause = null ) : void
 	{
-		$clause = $this->getClause( $clause );
+		$clause = $this->getClause($clause);
 
 		// Pop off the last phrase.
-		array_pop( $this->clausesInProgress[ $clause ] );
+		array_pop( $this->clausesInProgress[$clause] );
 
 		// Replace it with the new one.
-		$this->clausesInProgress[ $clause ][] = $sql;
+		$this->clausesInProgress[$clause][] = $sql;
 	}
 
 	/**
@@ -1003,7 +987,7 @@ class Claws {
 	 */
 	public function getClause( ?string $clause = null ) : string
 	{
-		if ( ! isset( $clause ) || ! in_array( $clause, $this->allowedClauses, true ) ) {
+		if (! isset($clause) || !in_array($clause, $this->allowedClauses, true)) {
 			$clause = $this->currentClause;
 		}
 
@@ -1021,7 +1005,7 @@ class Claws {
 	public function setCurrentField( string $field ) : static
 	{
 		if ( $field !== $this->getCurrentField() ) {
-			$this->currentField = \sanitize_key( $field );
+			$this->currentField = preg_replace( '/[^a-z0-9_\-]/', '', strtolower($field));
 		}
 
 		return $this;
@@ -1112,8 +1096,8 @@ class Claws {
 	 */
 	public function resetVars() : void
 	{
-		$this->currentClause    = null;
-		$this->currentField     = null;
+		$this->currentClause    = '';
+		$this->currentField     = '';
 		$this->currentOperator = Operator::OR;
 	}
 
@@ -1130,7 +1114,6 @@ class Claws {
 	{
 		// @TODO fix this discrepancy
 		$query = $sql;
-		$args = $values;
 
 		/*
 		 * Specify the formatting allowed in a placeholder. The following are allowed:
@@ -1168,9 +1151,9 @@ class Claws {
 		$placeholder_count = (($split_query_count - 1) / 3);
 
 		// If args were passed as an array, as in vsprintf(), move them up.
-		$passed_as_array = ( isset($args[0]) && is_array($args[0]) && 1 === count($args));
+		$passed_as_array = (isset($values[0]) && is_array($values[0]) && 1 === count($values)); // @phpstan-ignore-line
 		if ( $passed_as_array ) {
-			$args = $args[0];
+			$values = $values[0];
 		}
 
 		$new_query       = '';
@@ -1256,7 +1239,7 @@ class Claws {
 			return '';
 		}
 
-		$args_count = count($args);
+		$args_count = count($values);
 
 		if ($args_count !== $placeholder_count) {
 			if (1 === $placeholder_count && $passed_as_array) {
@@ -1287,7 +1270,7 @@ class Claws {
 
 		$args_escaped = array();
 
-		foreach ($args as $i => $value) {
+		foreach ($values as $i => $value) {
 			if (in_array($i, $arg_identifiers, true)) {
 				$args_escaped[] = str_replace('`', '``', $value);
 			} elseif ( is_int( $value ) || is_float( $value ) ) {
@@ -1312,16 +1295,11 @@ class Claws {
 	 *
 	 * Forked from WordPress' wpdb::_real_escape() method.
 	 *
-	 * @param $data
-	 *
+	 * @param string $data
 	 * @return string
 	 */
-	private function _real_escape($data) : string
+	private function _real_escape(string $data) : string
 	{
-		if (! is_scalar($data)) {
-			return '';
-		}
-
 		$escaped = addslashes($data);
 
 		return $this->add_placeholder_escape($escaped);
