@@ -57,7 +57,7 @@ class Claws {
 	 * Stores clauses in progress for retrieval.
 	 *
 	 * @since 1.0.0
-	 * @var   array
+	 * @var   array<string, string>
 	 */
 	private $clausesInProgress = array();
 
@@ -86,7 +86,7 @@ class Claws {
 	 * Whitelist of clauses Claws is built to handle.
 	 *
 	 * @since 1.0.0
-	 * @var   array
+	 * @var   string[]
 	 */
 	private $allowedClauses = array( 'where' );
 
@@ -96,7 +96,7 @@ class Claws {
 	 * @since 1.0.0
 	 *
 	 * @param string $name Method name.
-	 * @param array  $args Method arguments.
+	 * @param array<mixed> $args Method arguments.
 	 * @return static Claws instance.
 	 */
 	public function __call(string $name, array $args ) : static
@@ -107,7 +107,6 @@ class Claws {
 		 * us to circumvent that problem.
 		 */
 		switch( $name ) {
-
 			case 'or':
 				$clause = isset( $args[0] ) ? $args[0] : null;
 
@@ -115,7 +114,6 @@ class Claws {
 				$this->__setCurrentOperator(Operator::OR, $clause);
 
 				return $this;
-				break;
 
 			case 'and':
 				$clause = isset( $args[0] ) ? $args[0] : null;
@@ -124,7 +122,6 @@ class Claws {
 				$this->__setCurrentOperator(Operator::AND, $clause);
 
 				return $this;
-				break;
 		}
 
 		return $this;
@@ -135,19 +132,20 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param mixed           $values           Single value of varying types, or array of values.
-	 * @param string|callable $callback_or_type Sanitization callback to pass values through, or shorthand
-	 *                                          types to use preset callbacks. Default 'esc_sql'.
-	 * @param string          $compare_type     MySQL operator used for comparing the $value. Accepts '=', '!=',
-	 *                                          '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN',
-	 *                                          'NOT BETWEEN', 'EXISTS' or 'NOT EXISTS'.
-	 *                                          Default is 'IN' when `$value` is an array, '=' otherwise.
+	 * @param string      $field            Field to build conditions from.
+	 * @param mixed|null  $values           Single value of varying types, or array of values.
+	 * @param string|null $callback_or_type Sanitization callback to pass values through, or shorthand
+	 *                                      types to use preset callbacks. Default 'esc_sql'.
+	 * @param string|null $compare_type     MySQL operator used for comparing the $value. Accepts '=', '!=',
+	 *                                      '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN',
+	 *                                      'NOT BETWEEN', 'EXISTS' or 'NOT EXISTS'.
+	 *                                      Default is 'IN' when `$value` is an array, '=' otherwise.
 	 * @return static Current Claws instance.
 	 */
 	public function where(
 		string $field,
-		string|callable $compare_type = null,
-		?string $values = null,
+		string|null $compare_type = null,
+		$values = null,
 		?string $callback_or_type = 'esc_sql'
 	) : static
 	{
@@ -170,9 +168,9 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string           $type     Type of comparison. Accepts '=', '!=', '<', '>', '>=', or '<='.
-	 * @param string|int|array $values   Single value(s) of varying type, or an array of values.
-	 * @param callable         $callback Callback to pass to the comparison method.
+	 * @param string                  $type     Type of comparison. Accepts '=', '!=', '<', '>', '>=', or '<='.
+	 * @param string|int|array<mixed> $values   Single value(s) of varying type, or an array of values.
+	 * @param callable                $callback Callback to pass to the comparison method.
 	 * @return static Current Claws instance.
 	 */
 	public function compare(string $type, string|int|array $values, callable $callback ) : static
@@ -212,11 +210,11 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param mixed           $values           Value of varying types, or array of values.
-	 * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-	 *                                          types to use preset callbacks. Default 'esc_sql'.
-	 * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
-	 *                                          building the expression. Default 'OR'.
+	 * @param mixed|array<mixed> $values           Value of varying types, or array of values.
+	 * @param string|callable    $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
+	 *                                             types to use preset callbacks. Default 'esc_sql'.
+	 * @param Operator           $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
+	 *                                             building the expression. Default 'OR'.
 	 * @return static Current Claws instance.
 	 */
 	public function equals(
@@ -480,12 +478,12 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array           $values           Array of values.
+	 * @param array<mixed>    $values           Array of values.
 	 * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
 	 *                                          types to use preset callbacks. Default 'esc_sql'.
 	 * @return static Current Claws instance.
 	 */
-	public function between( $values, string|callable $callback_or_type = 'esc_sql' ) : static
+	public function between($values, string|callable $callback_or_type = 'esc_sql' ) : static
 	{
 		$sql = $this->getBetweenSql( $values, $callback_or_type, 'BETWEEN' );
 
@@ -562,7 +560,7 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array            $values           Array of values to compare.
+	 * @param array<mixed>     $values           Array of values to compare.
 	 * @param string|callable  $callback_or_type Sanitization callback to pass values through, or shorthand
 	 *                                           types to use preset callbacks.
 	 * @param string           $compare_type     Comparison type to make. Accepts '=', '!=', '<', '>', '<=', or '>='.
@@ -583,7 +581,6 @@ class Claws {
 		}
 
 		$callback = $this->getCallback( $callback_or_type );
-		$operator = $this->getOperator($operator);
 		$values   = $this->prepareValues( $values );
 
 		// Sanitize the values and built the SQL.
@@ -597,10 +594,10 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array    $values       Array of values.
-	 * @param string   $compare_type Comparison type to make. Accepts '=', '!=', '<', '>', '<=', or '>='.
-	 *                               Default '='.
-	 * @param Operator $operator     Optional. Operator to use between value comparisons. Default Operator::OR.
+	 * @param array<mixed> $values       Array of values.
+	 * @param string       $compare_type Comparison type to make. Accepts '=', '!=', '<', '>', '<=', or '>='.
+	 *                                   Default '='.
+	 * @param Operator     $operator     Optional. Operator to use between value comparisons. Default Operator::OR.
 	 * @return string Comparison SQL.
 	 */
 	protected function buildComparisonSql(
@@ -645,7 +642,7 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array           $values           Array of values to compare.
+	 * @param array<mixed>    $values           Array of values to compare.
 	 * @param string|callable $callback_or_type Sanitization callback to pass values through, or shorthand
 	 *                                          types to use preset callbacks.
 	 * @param string          $compare_type     Comparison to make. Accepts 'IN' or 'NOT IN'.
@@ -684,7 +681,7 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array           $values           Array of values to compare.
+	 * @param array<mixed>    $values           Array of values to compare.
 	 * @param string|callable $callback_or_type Sanitization callback to pass values through, or shorthand
 	 *                                          types to use preset callbacks.
 	 * @param string          $compare_type     Comparison to make. Accepts 'LIKE' or 'NOT LIKE'.
@@ -733,13 +730,13 @@ class Claws {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array           $values           Array of values to compare.
+	 * @param array<mixed>    $values           Array of values to compare.
 	 * @param string|callable $callback_or_type Sanitization callback to pass values through, or shorthand
 	 *                                          types to use preset callbacks.
 	 * @param string          $compare_type     Comparison to make. Accepts 'BETWEEN' or 'NOT BETWEEN'.
 	 * @return string Raw, sanitized SQL.
 	 */
-	protected function getBetweenSql( $values, string|callable $callback_or_type, string $compare_type ) : string
+	protected function getBetweenSql($values, string|callable $callback_or_type, string $compare_type) : string
 	{
 		$sql = '';
 
@@ -859,23 +856,6 @@ class Claws {
 	public function getCastForType(string $type) : string
 	{
 		return SqlType::CHAR->resolve($type);
-	}
-
-	/**
-	 * Validates and retrieves the operator.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param Operator|string $operator Operator.
-	 * @return string Operator. 'OR' if an invalid operator is passed to `$operator`.
-	 */
-	public function getOperator(Operator|string $operator) : string
-	{
-		if (is_string($operator)) {
-			$operator = Operator::tryFrom($operator) ?? Operator::OR;
-		}
-
-		return $operator->value;
 	}
 
 	/**
