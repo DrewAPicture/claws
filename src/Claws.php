@@ -35,7 +35,7 @@ class Claws
      * @since 1.0.0
      * @var   string
      */
-    private $currentClause;
+    private string $currentClause;
 
     /**
      * Represents the current field(s) being worked with.
@@ -43,7 +43,7 @@ class Claws
      * @since 1.0.0
      * @var   string
      */
-    private $currentField;
+    private string $currentField;
 
     /**
      * Used for carrying the operator between methods when doing complex operations.
@@ -51,7 +51,7 @@ class Claws
      * @since 1.0.0
      * @var   Operator
      */
-    private $currentOperator;
+    private Operator $currentOperator;
 
     /**
      * Stores clauses in progress for retrieval.
@@ -59,7 +59,7 @@ class Claws
      * @since 1.0.0
      * @var   array<string, array<string>>
      */
-    private $clausesInProgress = [];
+    private array $clausesInProgress = [];
 
     /**
      * Whether the current operation is amending the previous phrase.
@@ -70,7 +70,7 @@ class Claws
      * @since 1.0.0
      * @var   bool
      */
-    private $amendingPrevious = false;
+    private bool $amendingPrevious = false;
 
     /**
      * Holds the value of the previously-stored phrase when set.
@@ -80,7 +80,7 @@ class Claws
      * @since 1.0.0
      * @var   string
      */
-    private $previousPhrase;
+    private string $previousPhrase;
 
     /**
      * Whitelist of clauses Claws is built to handle.
@@ -88,7 +88,7 @@ class Claws
      * @since 1.0.0
      * @var   string[]
      */
-    private $allowedClauses = ['where'];
+    private array $allowedClauses = ['where'];
 
     /**
      * Handles calling pseudo-methods.
