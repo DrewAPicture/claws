@@ -13,8 +13,11 @@
 
 namespace SharperClaws;
 
+use SharperClaws\Helpers\EscapeHelper;
+use SharperClaws\Helpers\SanitizeHelper;
 use SharperClaws\Enums\Operator;
 use SharperClaws\Enums\SqlType;
+use SharperClaws\Helpers\TypeHelper;
 
 /**
  * Implements a library to provide a variety of database sanitization helpers when
@@ -148,7 +151,7 @@ class Claws
         string $field,
         string|null $compare_type = null,
         $values = null,
-        ?string $callback_or_type = 'esc_sql'
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql']
     ) : static {
         $this->setCurrentClause('where');
         $this->setCurrentField($field);
@@ -216,7 +219,7 @@ class Claws
      *
      * @param mixed|array<mixed> $values           Value of varying types, or array of values.
      * @param string|callable    $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                             types to use preset callbacks. Default 'esc_sql'.
+     *                                             types to use preset callbacks. Default Escape::sql().
      * @param Operator           $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                             building the expression. Default 'OR'.
      *
@@ -224,7 +227,7 @@ class Claws
      */
     public function equals(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getComparisonSql(
@@ -246,7 +249,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default 'OR'.
      *
@@ -254,7 +257,7 @@ class Claws
      */
     public function doesntEqual(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getComparisonSql(
@@ -276,7 +279,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -284,7 +287,7 @@ class Claws
      */
     public function gt(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getComparisonSql(
@@ -306,7 +309,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -314,7 +317,7 @@ class Claws
      */
     public function lt(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getComparisonSql(
@@ -336,7 +339,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -344,7 +347,7 @@ class Claws
      */
     public function gte(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getComparisonSql(
@@ -366,7 +369,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -374,7 +377,7 @@ class Claws
      */
     public function lte(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getComparisonSql(
@@ -404,7 +407,7 @@ class Claws
      */
     public function like(
         $values,
-        string|callable $callback_or_type = 'esc_like',
+        string|callable $callback_or_type = [EscapeHelper::class, 'like'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getLikeSql($values, $callback_or_type, 'LIKE', $operator);
@@ -429,7 +432,7 @@ class Claws
      */
     public function notLike(
         $values,
-        string|callable $callback_or_type = 'esc_like',
+        string|callable $callback_or_type = [EscapeHelper::class, 'like'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->getLikeSql(
@@ -451,7 +454,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -459,7 +462,7 @@ class Claws
      */
     public function in(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         if (!is_array($values)) {
@@ -480,7 +483,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -488,7 +491,7 @@ class Claws
      */
     public function notIn(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         if (!is_array($values)) {
@@ -513,13 +516,13 @@ class Claws
      *
      * @param array<mixed>    $values           Array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      *
      * @return static Current Claws instance.
      */
     public function between(
         $values,
-        string|callable $callback_or_type = 'esc_sql'
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql']
     ) : static {
         $sql = $this->getBetweenSql($values, $callback_or_type, 'BETWEEN');
 
@@ -535,13 +538,13 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      *
      * @return static Current Claws instance.
      */
     public function notBetween(
         $values,
-        string|callable $callback_or_type = 'esc_sql'
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql']
     ) : static {
         $sql = $this->getBetweenSql($values, $callback_or_type, 'NOT BETWEEN');
 
@@ -557,7 +560,7 @@ class Claws
      *
      * @param mixed           $values           Value of varying types, or array of values.
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
@@ -565,7 +568,7 @@ class Claws
      */
     public function exists(
         $values,
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         return $this->equals($values, $callback_or_type, $operator);
@@ -577,14 +580,14 @@ class Claws
      * @since 1.0.0
      *
      * @param string|callable $callback_or_type Optional. Sanitization callback to pass values through, or shorthand
-     *                                          types to use preset callbacks. Default 'esc_sql'.
+     *                                          types to use preset callbacks. Default Escape::sql().
      * @param Operator        $operator         Optional. If `$value` is an array, whether to use 'OR' or 'AND' when
      *                                          building the expression. Default Operator::OR.
      *
      * @return static Current Claws instance.
      */
     public function notExists(
-        string|callable $callback_or_type = 'esc_sql',
+        string|callable $callback_or_type = [EscapeHelper::class, 'sql'],
         Operator $operator = Operator::OR
     ) : static {
         $sql = $this->buildComparisonSql([''], 'IS NULL', $operator);
@@ -850,28 +853,28 @@ class Claws
         switch ($type) {
             case 'int':
             case 'integer':
-                $callback = 'intval';
+                $callback = [TypeHelper::class, 'int'];
                 break;
 
             case 'float':
             case 'double':
-                $callback = 'floatval';
+                $callback = [TypeHelper::class, 'float'];
                 break;
 
             case 'string':
-                $callback = 'sanitize_text_field';
+                $callback = [TypeHelper::class, 'string'];
                 break;
 
             case 'key':
-                $callback = 'sanitize_key';
+                $callback = [SanitizeHelper::class, 'key'];
                 break;
 
             case 'esc_like':
-                $callback = [$this, 'escLike'];
+                $callback = [EscapeHelper::class, 'like'];
                 break;
 
             default:
-                $callback = 'esc_sql';
+                $callback = [EscapeHelper::class, 'sql'];
                 break;
         }
 
@@ -1072,11 +1075,7 @@ class Claws
     public function setCurrentField(string $field) : static
     {
         if ($field !== $this->getCurrentField()) {
-            $this->currentField = preg_replace(
-                '/[^a-z0-9_\-]/',
-                '',
-                strtolower($field)
-            );
+            $this->currentField = SanitizeHelper::key($field);
         }
 
         return $this;
@@ -1396,66 +1395,15 @@ class Claws
                     $value = '';
                 }
 
-                $args_escaped[] = $this->_real_escape($value);
+                $args_escaped[] = EscapeHelper::real_escape($value);
             }
         }
 
         $sql = vsprintf($query, $args_escaped);
 
-        return $this->add_placeholder_escape($sql);
+        return EscapeHelper::add_placeholder_escape($sql);
     }
 
-    /**
-     * Real escape, using mysqli_real_escape_string() or mysql_real_escape_string().
-     *
-     * Forked from WordPress' wpdb::_real_escape() method.
-     *
-     * @param string $data
-     *
-     * @return string
-     */
-    private function _real_escape(string $data) : string
-    {
-        $escaped = addslashes($data);
-
-        return $this->add_placeholder_escape($escaped);
-    }
-
-    /**
-     * Adds a placeholder escape string, to escape anything that resembles a printf() placeholder.
-     *
-     * Forked from WordPress' wpdb::add_placeholder_escape() method.
-     *
-     * @param string $sql SQL.
-     *
-     * @return string
-     */
-    private function add_placeholder_escape(string $sql) : string
-    {
-        return str_replace('%', $this->placeholder_escape(), $sql);
-    }
-
-    /**
-     * Replace % placeholders with a hash.
-     *
-     * Forked from WordPress' wpdb::placeholder_escape() method.
-     *
-     * @return string
-     */
-    private function placeholder_escape() : string
-    {
-        static $placeholder;
-
-        if (!$placeholder) {
-            // If ext/hash is not present, compat.php's hash_hmac() does not support sha256.
-            $algo = function_exists('hash') ? 'sha256' : 'sha1';
-            $salt = (string)rand();
-
-            $placeholder = '{'.hash_hmac($algo, uniqid($salt, true), $salt).'}';
-        }
-
-        return $placeholder;
-    }
 }
 
 /**
