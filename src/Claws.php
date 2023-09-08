@@ -94,44 +94,6 @@ class Claws
     private array $allowedClauses = ['where'];
 
     /**
-     * Handles calling pseudo-methods.
-     *
-     * @since 1.0.0
-     *
-     * @param string       $name Method name.
-     * @param array<mixed> $args Method arguments.
-     *
-     * @return static Claws instance.
-     */
-    public function __call(string $name, array $args) : static
-    {
-        /*
-         * Prior to PHP 7, reserved keywords could not be used in method names,
-         * so having or()/and() methods wouldn't be allowed. Using __call() allows
-         * us to circumvent that problem.
-         */
-        switch ($name) {
-            case 'or':
-                $clause = $args[0] ?: null;
-
-                // Shared logic.
-                $this->__setCurrentOperator(Operator::OR, $clause);
-
-                return $this;
-
-            case 'and':
-                $clause = $args[0] ?: null;
-
-                // Shared logic.
-                $this->__setCurrentOperator(Operator::AND, $clause);
-
-                return $this;
-        }
-
-        return $this;
-    }
-
-    /**
      * Builds a section of the WHERE clause.
      *
      * @since 1.0.0
@@ -210,6 +172,32 @@ class Claws
         }
 
         return $this;
+    }
+
+    /**
+     * Sets the OR operator mid-chain.
+     *
+     * @since 2.0.0
+     *
+     * @param string|null $clause
+     * @return static Current Claws instance.
+     */
+    public function or(?string $clause) : static
+    {
+        return $this->__setCurrentOperator(Operator::OR, $clause);
+    }
+
+    /**
+     * Sets the AND operator mid-chain.
+     *
+     * @since 2.0.0
+     *
+     * @param string|null $clause
+     * @return static Current Claws instance.
+     */
+    public function and(?string $clause) : static
+    {
+        return $this->__setCurrentOperator(Operator::AND, $clause);
     }
 
     /**
