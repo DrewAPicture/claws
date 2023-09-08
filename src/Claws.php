@@ -98,14 +98,14 @@ class Claws
      *
      * @since 1.0.0
      *
-     * @param string      $field            Field to build conditions from.
-     * @param mixed|null  $values           Single value of varying types, or array of values.
-     * @param string|null $callback_or_type Sanitization callback to pass values through, or shorthand
-     *                                      types to use preset callbacks. Default 'esc_sql'.
-     * @param string|null $compare_type     MySQL operator used for comparing the $value. Accepts '=', '!=',
-     *                                      '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN',
-     *                                      'NOT BETWEEN', 'EXISTS' or 'NOT EXISTS'.
-     *                                      Default is 'IN' when `$value` is an array, '=' otherwise.
+     * @param string          $field            Field to build conditions from.
+     * @param mixed|null      $values           Single value of varying types, or array of values.
+     * @param string|callable $callback_or_type Sanitization callback to pass values through, or shorthand
+     *                                          types to use preset callbacks. Default Escape::sql().
+     * @param string|null     $compare_type     MySQL operator used for comparing the $value. Accepts '=', '!=',
+     *                                          '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN',
+     *                                          'NOT BETWEEN', 'EXISTS' or 'NOT EXISTS'.
+     *                                          Default is 'IN' when `$value` is an array, '=' otherwise.
      *
      * @return static Current Claws instance.
      */
@@ -1232,8 +1232,8 @@ class Claws
         $placeholder_count = (($split_query_count - 1) / 3);
 
         // If args were passed as an array, as in vsprintf(), move them up.
-        $passed_as_array = (isset($values[0]) && is_array($values[0])
-            && 1 === count($values)); // @phpstan-ignore-line
+        $passed_as_array = (isset($values[0]) && is_array($values[0]) // @phpstan-ignore-line
+            && 1 === count($values));
         if ($passed_as_array) {
             $values = $values[0];
         }
